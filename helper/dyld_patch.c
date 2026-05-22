@@ -15,7 +15,7 @@
 //   - `bl <halt>; brk #1` halt callers → `b +8` (skips, gated on forces)
 //
 // abort_addrs[] (NULL-terminated, max 7 entries) lists target addresses
-// to EXCLUDE from the skip pass — halt's own body ends with
+// to EXCLUDE from the skip pass  halt's own body ends with
 // `bl abort_with_payload; brk #1` and falling through lands in padding.
 static int scan_dyld_text(task_t task, mach_vm_address_t dyld_base,
                           const mach_vm_address_t *abort_addrs) {
@@ -53,7 +53,7 @@ static int scan_dyld_text(task_t task, mach_vm_address_t dyld_base,
     // and movz+svc byte patterns inside format strings and constant
     // tables, then we patch READ-ONLY DATA as if it were code. On iOS
     // 16.1.1 we hit one such false positive at dyld+0x79650 (the C
-    // string ` => "%s"\n\0tried: '%s' (%s)\0...`) — patching the first
+    // string ` => "%s"\n\0tried: '%s' (%s)\0...`)  patching the first
     // 4 bytes corrupted dyld's error formatter and the target died with
     // SIGKILL as soon as it tried to format any message.
     //
@@ -196,7 +196,7 @@ static int scan_dyld_text(task_t task, mach_vm_address_t dyld_base,
     // touching libdispatch / libsystem auxiliary syscalls (kqueue,
     // psynch, workloop) breaks dyld init and the target gets SIGKILL'd
     // by the runtime watchdog. Only enabled when force_weak fired,
-    // i.e. the target actually has cross-OS bind risk — for everything
+    // i.e. the target actually has cross-OS bind risk  for everything
     // else these patches are pure downside.
     //
     // SYS_exit               = 1
@@ -235,13 +235,13 @@ static int scan_dyld_text(task_t task, mach_vm_address_t dyld_base,
     //
     // We don't have dyld_halt's address (no symbol resolution from raw
     // bytes), but it's structurally the bl-target that appears MOST
-    // often in `bl X; brk #1` pairs inside dyld — every internal
+    // often in `bl X; brk #1` pairs inside dyld  every internal
     // assert/error path BLs into the same halt routine before the
     // brk marker. Build a frequency tally over the matches, pick the
     // single most-common bl_target (with at least 3 callers), and
     // patch only that one. False positives in __cstring no longer
     // happen (we scan only __text), and within __text bl_target
-    // distribution is heavily skewed — dyld_halt wins by >10x in
+    // distribution is heavily skewed  dyld_halt wins by >10x in
     // every tested version (16.1.1: 1 random match vs 44 halt
     // callers; 16.7.11: similar).
     int skips = 0;
@@ -293,7 +293,7 @@ static int scan_dyld_text(task_t task, mach_vm_address_t dyld_base,
             emit(LOG_DEBUG, "patch.halt_consensus", &hd,
                  "skip_halt consensus: halt=0x%llx callers=%d/%zu",
                  (unsigned long long)halt_addr, halt_count, ncands);
-            // Only patch if winner has a clear majority — at least 3
+            // Only patch if winner has a clear majority  at least 3
             // callers AND at least 3x the second-most-common. Avoids
             // false positives when dyld is missing patterns entirely.
             int second_count = 0;
@@ -396,7 +396,7 @@ int dyld_patch_apply(task_t task,
         attrs_t a; attrs_init(&a);
         attrs_hex(&a, "dyld", (unsigned long long)dyld_base);
         emit(LOG_WARN, "patch.dyld_base_bogus", &a,
-             "dyld base 0x%llx outside user-VA range — patches skipped",
+             "dyld base 0x%llx outside user-VA range  patches skipped",
              (unsigned long long)dyld_base);
         return hits;
     }
@@ -491,7 +491,7 @@ int dyld_find_api_locks(task_t task, mach_vm_address_t *out, int max) {
             blank_runs = 0;
             continue;
         }
-        // Skip this 4KB page (leaves zeros — won't match any insn pattern).
+        // Skip this 4KB page (leaves zeros  won't match any insn pattern).
         pos += 0x1000;
         blank_runs++;
         if (blank_runs > 64) break;  // 256KB of unmapped → assume end of image

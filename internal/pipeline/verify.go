@@ -52,9 +52,9 @@ func (r VerifyResult) OK() bool {
 // its source slice outside the cryptid byte and the encrypted region,
 // catching cryptid-zeroed-without-decrypting and any out-of-band byte
 // corruption. When skipAppex is true, entries under Payload/<App>.app
-// /PlugIns/ are ignored — the helper left them encrypted on purpose.
+// /PlugIns/ are ignored  the helper left them encrypted on purpose.
 //
-// Output is THIN — helper drops fat siblings — so each output entry
+// Output is THIN  helper drops fat siblings  so each output entry
 // maps to one specific slice in a (possibly fat) source.
 func Verify(outputIPA, sourceIPA string, skipAppex bool) (VerifyResult, error) {
 	var res VerifyResult
@@ -121,7 +121,7 @@ func Verify(outputIPA, sourceIPA string, skipAppex bool) (VerifyResult, error) {
 			}
 
 			// Source isn't Mach-O (TBD stubs, .a archives, resolved
-			// symlinks) — nothing FairPlay touches, skip.
+			// symlinks)  nothing FairPlay touches, skip.
 			if !srcIsMacho {
 				continue
 			}
@@ -143,7 +143,7 @@ func Verify(outputIPA, sourceIPA string, skipAppex bool) (VerifyResult, error) {
 		// Source-free fallback: flag thin outputs whose entire crypt
 		// region is zeros. False positives are possible if the source
 		// shipped LC_ENCRYPTION_INFO with cryptid==0 over a genuinely
-		// zero region — rare, and source-aware verify catches it.
+		// zero region  rare, and source-aware verify catches it.
 		if cryptZeroed(outData) {
 			res.AllZeroCrypt = append(res.AllZeroCrypt, of.Name)
 		}
@@ -379,7 +379,7 @@ func compareMachOSlice(outData, srcData []byte) string {
 
 	outCrypt, err := readEncryptionInfo(outData)
 	if err != nil {
-		// No LC_ENCRYPTION_INFO in output — slice was never encrypted.
+		// No LC_ENCRYPTION_INFO in output  slice was never encrypted.
 		// Direct compare without the cryptid/cryptoff skip.
 		if bytes.Equal(outData, srcSlice) {
 			return ""
@@ -393,7 +393,7 @@ func compareMachOSlice(outData, srcData []byte) string {
 		return "parse source LC_ENCRYPTION_INFO: " + err.Error()
 	}
 
-	// Helper only patches cryptid and decrypts bytes — never moves
+	// Helper only patches cryptid and decrypts bytes  never moves
 	// cryptoff or cryptsize.
 	if outCrypt.cryptoff != srcCrypt.cryptoff ||
 		outCrypt.cryptsize != srcCrypt.cryptsize {

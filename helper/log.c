@@ -137,7 +137,7 @@ void emit(log_level_t level, const char *event_name, const attrs_t *a,
         vsnprintf(buf, sizeof(buf), human_fmt, ap);
         va_end(ap);
 
-        // msg= always quoted — human strings usually contain spaces.
+        // msg= always quoted  human strings usually contain spaces.
         char qbuf[1280];
         int qn = append_quoted(qbuf, (int)sizeof(qbuf), buf);
         fprintf(stdout, " msg=%.*s", qn, qbuf);

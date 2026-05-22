@@ -98,7 +98,7 @@ static thread_act_t pick_hijack_thread(task_t task) {
 }
 
 // Mark a hijack thread as unusable so pick_hijack_thread won't re-hand
-// it out. We deliberately do NOT thread_terminate the target's thread —
+// it out. We deliberately do NOT thread_terminate the target's thread 
 // on iOS 16 the kernel sometimes responds to thread_terminate of a
 // platform-binary's thread by killing the caller (saw exit 137). The
 // blacklist alone is enough: subsequent thread_set_state on the wedged
@@ -268,9 +268,9 @@ static int inject_dlopen(task_t task, mach_port_t exc_port,
         return -1;
     }
 
-    // Successful dlopens finish well under 1s. Failed dlopens — Python
+    // Successful dlopens finish well under 1s. Failed dlopens  Python
     // cpython modules with unresolved sibling imports, frameworks whose
-    // @rpath libs aren't loaded — sit in dyld's bind retry until our
+    // @rpath libs aren't loaded  sit in dyld's bind retry until our
     // timeout, so keep it tight to avoid compounding into minutes.
     uint64_t handle = 0;
     if (target_call(task, thread, exc_port, target_dlopen,
@@ -488,10 +488,10 @@ static void collect_candidates(const char *bundle_src,
 // ----- Thread pool: fresh pthreads spawned in target ------------------------
 //
 // One bootstrap hijack (typically main thread) calls pthread_create N
-// times. Each new pthread runs pause() — it sits in __sigsuspend with
+// times. Each new pthread runs pause()  it sits in __sigsuspend with
 // zero dyld state, no held locks. We hand out one fresh pool entry per
 // dlopen attempt and never reuse it. dlopen either returns (NULL on
-// bind failure, handle on success) — both are quick. If it wedges
+// bind failure, handle on success)  both are quick. If it wedges
 // mid-bind, the pool thread stays stuck holding the dyld API lock; we
 // reset the lock externally and move to the next fresh thread.
 //
@@ -677,14 +677,14 @@ int inject_missing_frameworks(task_t task, mach_port_t exc,
                                                          (void *)dlopen);
     if (!target_dlopen) {
         emit(LOG_WARN, "inject.no_dlopen", NULL,
-             "target dlopen unresolved — inject skipped");
+             "target dlopen unresolved  inject skipped");
         return 0;
     }
 
     thread_act_t bootstrap = pick_hijack_thread(task);
     if (bootstrap == MACH_PORT_NULL) {
         emit(LOG_WARN, "inject.no_bootstrap", NULL,
-             "no usable bootstrap thread — inject skipped");
+             "no usable bootstrap thread  inject skipped");
         return 0;
     }
 
@@ -700,7 +700,7 @@ int inject_missing_frameworks(task_t task, mach_port_t exc,
     collect_candidates(bundle_src, runtime, imgs, img_count, &fws);
 
     // Count remaining work to size the pool. One pool thread per dlopen
-    // attempt — we never reuse, so the pool has to cover the worst-case
+    // attempt  we never reuse, so the pool has to cover the worst-case
     // sum of attempts across topo passes.
     int candidates = 0;
     for (int i = 0; i < fws.count; i++) {
@@ -721,7 +721,7 @@ int inject_missing_frameworks(task_t task, mach_port_t exc,
     }
 
     // dyld API locks for emergency reset between calls (in case a prior
-    // dlopen wedged a pool thread mid-bind holding the API lock — fresh
+    // dlopen wedged a pool thread mid-bind holding the API lock  fresh
     // thread can't grab it without the reset).
     mach_vm_address_t api_locks[16] = {0};
     int api_lock_count = dyld_find_api_locks(task, api_locks,
@@ -733,7 +733,7 @@ int inject_missing_frameworks(task_t task, mach_port_t exc,
     threadpool_t tp;
     if (tp_init(&tp, task, exc, bootstrap, imgs, img_count, pool_target) != 0) {
         emit(LOG_WARN, "inject.tp_init_fail", NULL,
-             "threadpool init failed — inject skipped");
+             "threadpool init failed  inject skipped");
         fwvec_free(&fws);
         keyset_free(&loaded);
         mach_port_deallocate(mach_task_self(), bootstrap);
@@ -804,7 +804,7 @@ int inject_missing_frameworks(task_t task, mach_port_t exc,
                 continue;
             }
 
-            // Reset API lock first — if a prior pool thread wedged mid-
+            // Reset API lock first  if a prior pool thread wedged mid-
             // bind, this clears the lock so our fresh thread can proceed.
             reset_api_locks(task, api_locks, api_lock_count);
 

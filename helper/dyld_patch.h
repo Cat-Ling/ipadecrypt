@@ -9,10 +9,10 @@
 // cohesion don't terminate the process before the dump pass can run.
 //
 // Three concurrent passes:
-//   forces — rewrite resolveSymbol's CBZ-Wn weakImport check → NOP, so
+//   forces  rewrite resolveSymbol's CBZ-Wn weakImport check → NOP, so
 //            missing symbols always take the bind-to-NULL branch.
-//   kills  — NOP `movz x16,#N; svc #0x80` for process-killing syscalls.
-//   skips  — rewrite `bl <halt>; brk #1` halt callers to `b +8` so dyld
+//   kills   NOP `movz x16,#N; svc #0x80` for process-killing syscalls.
+//   skips   rewrite `bl <halt>; brk #1` halt callers to `b +8` so dyld
 //            falls through the noreturn marker. Only fires when forces>0
 //            (false-positive risk on non-cross-OS apps).
 //

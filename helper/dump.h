@@ -22,7 +22,7 @@ const char *dump_reason(dump_result_t r);
 // Decrypt the matched slice into a thin Mach-O at `dst`. Fat siblings
 // are dropped on the way out. For encrypted slices, verifies plaintext
 // was actually returned (vs zero-fill or unchanged ciphertext) before
-// committing the write — false-positive defense for iOS 15 Dopamine
+// committing the write  false-positive defense for iOS 15 Dopamine
 // where FairPlay decrypt-on-fault doesn't fire reliably.
 dump_result_t dump_image(const char *src, const char *dst, task_t task,
                          mach_vm_address_t image_base,

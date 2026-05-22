@@ -22,7 +22,7 @@ struct dyld_image_info *target_list_images(task_t task,
 
 // Find an image in the target's image list by basename match against
 // `helper_path`. Falls back to aii.dyldImageLoadAddress *only* when the
-// caller is specifically asking for dyld (basename "dyld") — that
+// caller is specifically asking for dyld (basename "dyld")  that
 // fallback is the standalone loader's base and would be wrong for any
 // other lookup (Dopamine sidecars dyld outside the shared cache, so
 // libdyld and dyld differ in base).

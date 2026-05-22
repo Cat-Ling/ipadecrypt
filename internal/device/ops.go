@@ -43,7 +43,7 @@ func (c *Client) Probe() (ProbeResult, error) {
 	// the sysctl / rootless locations, so try a few absolute paths before
 	// giving up. The 2>/dev/null suppresses expected "not found" from the
 	// unmatched ones.
-	// `uname -m` on iOS always returns "arm64" — Apple doesn't expose
+	// `uname -m` on iOS always returns "arm64"  Apple doesn't expose
 	// the arm64e subtype through the standard syscall. Read cpusubtype
 	// directly from the mach header of `/sbin/launchd` (always present,
 	// always thin to the device's actual arch). Offset 8 in the

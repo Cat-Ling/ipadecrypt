@@ -105,7 +105,7 @@ int decrypt_bundle(const char *bundle_src, const char *bundle_dst,
     }
 
     // ptrace path (appex, or SBS-rejected main): stop here. Main exec
-    // is what we got from the PT_ATTACHEXC stop — resuming via
+    // is what we got from the PT_ATTACHEXC stop  resuming via
     // PT_CONTINUE would just race AMFI's runtime kill.
     if (via_ptrace) {
         ptrace(PT_KILL, pid, 0, 0);

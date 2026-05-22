@@ -687,7 +687,7 @@ func runDecryptOnBundle(dev *device.Client, helperPath, bundleID, bundlePath, ve
 
 	if !decryptNoVerify {
 		if decryptExtraVerify && srcIPAPath == "" {
-			tui.Info("source byte-compare skipped: no source IPA available for the installed-bundle path")
+			tui.Info("extra-verify unavailable when source ipa is not present")
 		}
 
 		compareSource := decryptExtraVerify && srcIPAPath != ""
@@ -714,15 +714,15 @@ func runDecryptOnBundle(dev *device.Client, helperPath, bundleID, bundlePath, ve
 			live.Fail("verify failed: %s", verifyFailureSummary(res))
 
 			for _, n := range res.StillEncrypted {
-				tui.Info("  %s — still encrypted (cryptid != 0)", n)
+				tui.Info("  %s  still encrypted (cryptid != 0)", n)
 			}
 
 			for _, n := range res.AllZeroCrypt {
-				tui.Info("  %s — crypt region all zeros", n)
+				tui.Info("  %s  crypt region all zeros", n)
 			}
 
 			for _, m := range res.Mismatches {
-				tui.Info("  %s — %s", m.Name, m.Reason)
+				tui.Info("  %s  %s", m.Name, m.Reason)
 			}
 
 			return
@@ -1061,7 +1061,7 @@ func (p *helperProgress) HandleEvent(ev device.Event) helperUpdate {
 			upd.note = ""
 		}
 
-	// Trap on the benign dyld halt brk is silent — the helper catches it
+	// Trap on the benign dyld halt brk is silent  the helper catches it
 	// on purpose so the address space stays readable; nothing to surface.
 	case "dyld.trapped":
 		if ev.Attr("exception") == "EXC_BREAKPOINT" {

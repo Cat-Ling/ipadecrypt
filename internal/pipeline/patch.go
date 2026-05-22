@@ -110,7 +110,7 @@ func isMainAppInfoPlist(name string) bool {
 		parts[2] == "Info.plist"
 }
 
-// copyEntry forwards an entry verbatim — no decompress + recompress.
+// copyEntry forwards an entry verbatim  no decompress + recompress.
 // CreateRaw + OpenRaw stream the original deflate bytes byte-for-byte,
 // which is the only thing that makes a multi-GB IPA repack survivable.
 func copyEntry(f *zip.File, w *zip.Writer) error {
@@ -136,7 +136,7 @@ func copyEntry(f *zip.File, w *zip.Writer) error {
 // the new contents replace the original; nil bytes leave the entry untouched.
 // When dropWatch is true, Payload/<App>.app/Watch/* entries are dropped.
 //
-// If edit returns an error, dst is not opened — callers get the same
+// If edit returns an error, dst is not opened  callers get the same
 // "fail before writing a partial output" guarantee the old pre-scan offered.
 // If neither Info.plist nor any Watch entry needs changing, dst is not
 // created at all and (false, 0, nil) is returned, so callers can no-op

@@ -127,7 +127,7 @@ static int sbs_launch(const char *bundle_id, const char *exec_path,
 // fallback when SBS rejects a main app (e.g. cross-SDK reject on
 // iOS 16 for iOS 18-SDK binaries). The caller (decrypt_bundle) vm_reads
 // the main exec at the PT_ATTACHEXC stop and terminates without ever
-// resuming, so we don't need to mark the target debugged — it never
+// resuming, so we don't need to mark the target debugged  it never
 // runs a single instruction past exec.
 static int do_ptrace_spawn(const char *exec_path, pid_t *out_pid) {
     pid_t pid = fork();

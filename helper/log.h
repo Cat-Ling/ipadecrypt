@@ -10,7 +10,7 @@
 //     @evt event=NAME level=LVL msg="human text" k=v k=v ...
 //
 // The Go CLI parses the @evt stream for the TUI. SSH users reading
-// directly see the same line — the `msg` attribute is human-readable.
+// directly see the same line  the `msg` attribute is human-readable.
 //
 // stderr is reserved for catastrophic helper-level failures (crashes,
 // panic-style aborts). Regular progress, warnings, errors all flow
