@@ -13,6 +13,7 @@ var Version = "dev"
 
 var (
 	rootDirOverride string
+	redactSensitive bool
 
 	bootstrapReset bool
 
@@ -39,6 +40,8 @@ func main() {
 
 	root.PersistentFlags().StringVar(&rootDirOverride, "root-dir", "",
 		"config root directory path (default: ~/.ipadecrypt)")
+	root.PersistentFlags().BoolVar(&redactSensitive, "redact", false,
+		"redact sensitive identifiers (Apple ID email, storefront) from output")
 
 	bootstrap := &cobra.Command{
 		Use:   "bootstrap",
@@ -77,6 +80,13 @@ func main() {
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func redact(s string) string {
+	if !redactSensitive || s == "" {
+		return s
+	}
+	return "######"
 }
 
 func loadConfigOrDefault(rootDir string) (*config.Config, *config.Paths, error) {

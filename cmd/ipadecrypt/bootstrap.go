@@ -107,9 +107,9 @@ func bootstrapHandler(cmd *cobra.Command, args []string) {
 	}
 
 	tui.Fields(
-		"Apple ID", account.Email,
+		"Apple ID", redact(account.Email),
 		"Name", account.Name,
-		"Storefront", fmt.Sprintf("%s (%s)", account.StoreFront, appStoreCountry),
+		"Storefront", fmt.Sprintf("%s (%s)", redact(account.StoreFront), redact(appStoreCountry)),
 	)
 
 	if err := cfg.Save(); err != nil {
