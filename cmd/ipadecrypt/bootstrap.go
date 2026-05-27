@@ -260,7 +260,6 @@ func bootstrapHandler(cmd *cobra.Command, args []string) {
 	tui.Bullet("AppSync Unified   bypasses installd's signature check")
 	tui.Bullet("                  add repo: https://lukezgd.github.io/repo")
 	tui.Bullet("appinst           installs modified IPAs on the device")
-	tui.Bullet("zip               packages the decrypted IPA on-device")
 	tui.Info("A reboot may be needed after installing; that's fine, we'll reconnect.")
 
 	prevLines := 0
@@ -289,7 +288,6 @@ func bootstrapHandler(cmd *cobra.Command, args []string) {
 			}{
 				{"AppSync Unified", pdev.LocateAppSync},
 				{"appinst", pdev.LocateAppinst},
-				{"zip", func() (string, error) { return pdev.LocateBinary("zip") }},
 			}
 			for _, c := range checks {
 				p, err := c.probe()

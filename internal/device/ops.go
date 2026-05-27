@@ -47,11 +47,13 @@ type ProbeResult struct {
 // are from their known layouts (no such hardware here to confirm).
 func classifyJailbreak(sig string) string {
 	f := map[string]string{}
+
 	for _, tok := range strings.Fields(sig) {
 		if k, v, ok := strings.Cut(tok, "="); ok {
 			f[k] = v
 		}
 	}
+
 	link := strings.ToLower(f["link"])
 	switch {
 	case strings.Contains(link, "dopamine") || strings.Contains(link, ".jbroot"):
@@ -128,6 +130,7 @@ printf 'JB link=%s vjb=%s\n' "$LINK" "$VJB"`
 	r.DeviceFamily = deviceFamilyFromModel(r.Model)
 
 	r.Jailbreak = "unknown"
+
 	for _, ln := range lines {
 		if s := strings.TrimSpace(ln); strings.HasPrefix(s, "JB ") {
 			r.Jailbreak = classifyJailbreak(strings.TrimPrefix(s, "JB "))
@@ -159,15 +162,6 @@ func (c *Client) LocateAppinst() (string, error) {
 	}
 
 	return "", nil
-}
-
-func (c *Client) LocateBinary(name string) (string, error) {
-	out, _, _, err := c.Run(fmt.Sprintf("command -v %s 2>/dev/null || true", name))
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(out), nil
 }
 
 func (c *Client) LocateAppSync() (string, error) {
