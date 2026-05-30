@@ -223,6 +223,23 @@ func (c *Client) Uninstall(bundlePath string) error {
 		return fmt.Errorf("refuse to uninstall: suspicious bundle path %q", bundlePath)
 	}
 
+	// Try proper uninstallation via appinst first if available
+	appinstPath, err := c.LocateAppinst()
+	if err == nil && appinstPath != "" {
+		infoPath := path.Join(bundlePath, "Info.plist")
+		bundleID, err := c.bundleIdentifierAt(infoPath)
+
+		if err == nil && bundleID != "" {
+			cmd := fmt.Sprintf("%s -u %s", appinstPath, shellQuote(bundleID))
+			_, _, code, err := c.RunSudo(cmd)
+
+			if err == nil && code == 0 {
+				return nil
+			}
+		}
+	}
+
+	// Legacy fallback: manual uicache unregistration and bundle directory deletion
 	uuidDir := path.Dir(bundlePath)
 
 	cmd := fmt.Sprintf("sh -c %s",

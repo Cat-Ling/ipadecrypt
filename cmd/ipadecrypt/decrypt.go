@@ -345,7 +345,10 @@ func decryptHandler(cmd *cobra.Command, args []string) {
 				uninstallBundleID = target.bundleId
 				uninstallBundlePath = installedPath
 
-				runDecryptOnBundle(dev, cleanups, helperPath, target.bundleId, installedPath, version, "")
+				success := runDecryptOnBundle(dev, cleanups, helperPath, target.bundleId, installedPath, version, "")
+				if !success {
+					uninstall = false
+				}
 
 				return
 			}
@@ -559,7 +562,10 @@ func decryptHandler(cmd *cobra.Command, args []string) {
 	uninstallBundleID = appBundleID
 	uninstallBundlePath = install.bundlePath
 
-	runDecryptOnBundle(dev, cleanups, plan.helperPath, appBundleID, install.bundlePath, appVersion, encPath)
+	success := runDecryptOnBundle(dev, cleanups, plan.helperPath, appBundleID, install.bundlePath, appVersion, encPath)
+	if !success {
+		uninstall = false
+	}
 }
 
 // decideUninstall picks the post-decrypt cleanup behavior. weInstalledIt
@@ -624,22 +630,22 @@ func verifyFailureSummary(res pipeline.VerifyResult) string {
 // srcIPAPath is the source IPA on the host when one exists (App Store
 // download / cache hit / local --ipa); empty for the use-installed path
 // where the source lives on-device only. Used by --extra-verify.
-func runDecryptOnBundle(dev *device.Client, cleanups *cleanupStack, helperPath, bundleID, bundlePath, version, srcIPAPath string) {
+func runDecryptOnBundle(dev *device.Client, cleanups *cleanupStack, helperPath, bundleID, bundlePath, version, srcIPAPath string) bool {
 	outLocal, err := localOutputPath(decryptOutput, bundleID, version)
 	if err != nil {
 		tui.Err("output path: %v", err)
-		return
+		return false
 	}
 
 	if err := os.MkdirAll(filepath.Dir(outLocal), 0o755); err != nil {
 		tui.Err("mkdir local: %v", err)
-		return
+		return false
 	}
 
 	outFile, err := os.OpenFile(outLocal, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
 		tui.Err("open local: %v", err)
-		return
+		return false
 	}
 
 	// Best-effort: drop the partially-written IPA on any error return.
@@ -702,7 +708,7 @@ func runDecryptOnBundle(dev *device.Client, cleanups *cleanupStack, helperPath, 
 		})
 		if assembleErr != nil {
 			live.Fail("assemble: %v", assembleErr)
-			return
+			return false
 		}
 	} else {
 		// Use-installed path: no source IPA on host, helper packages the
@@ -710,18 +716,18 @@ func runDecryptOnBundle(dev *device.Client, cleanups *cleanupStack, helperPath, 
 		code, err := dev.RunHelper(helperPath, bundleID, bundlePath, decryptVerbose, decryptSkipAppex, onEvent, cw)
 		if err != nil {
 			live.Fail("helper run: %v", err)
-			return
+			return false
 		}
 
 		if code != 0 {
 			live.Fail("helper exit %d", code)
-			return
+			return false
 		}
 	}
 
 	if err := outFile.Sync(); err != nil {
 		live.Fail("sync local: %v", err)
-		return
+		return false
 	}
 
 	live.OK("%s (%s → %s)", progress.Summary(), humanBytes(cw.n), outLocal)
@@ -748,7 +754,7 @@ func runDecryptOnBundle(dev *device.Client, cleanups *cleanupStack, helperPath, 
 		res, err := pipeline.Verify(outLocal, src, decryptSkipAppex)
 		if err != nil {
 			live.Fail("verify failed: %v", err)
-			return
+			return false
 		}
 
 		if !res.OK() {
@@ -766,13 +772,15 @@ func runDecryptOnBundle(dev *device.Client, cleanups *cleanupStack, helperPath, 
 				tui.Info("  %s %s", m.Name, m.Reason)
 			}
 
-			return
+			return false
 		}
 
 		live.OK("%s", verifyOKSummary(res, compareSource))
 	}
 
 	abandonLocal = false
+
+	return true
 }
 
 func lookupTargetApp(as *appstore.Client, acc *appstore.Account, target decryptTarget) (appstore.App, error) {
